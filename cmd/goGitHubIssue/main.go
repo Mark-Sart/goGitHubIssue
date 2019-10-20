@@ -36,7 +36,7 @@ func main() {
 	// Сохранение access-token
 	token := consoleIO.ReadString("Введите access-token:", scanner)
 	if token == "" {
-		log.Fatal("Не обнаружен access-token")
+		log.Fatal("Не был введен access-token")
 	}
 
 	credentials := gitHub.Credentials{

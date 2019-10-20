@@ -52,11 +52,14 @@ func ReadList(label string, scanner *bufio.Scanner) []string {
 	list := make([]string, 0, 0)
 
 	if scanner.Scan() {
-		input := strings.Trim(scanner.Text(), ",")
-		list = strings.Split(input, ",")
+		input := scanner.Text()
+		if input != "" {
+			input = strings.Trim(scanner.Text(), ",")
+			list = strings.Split(input, ",")
 
-		for idx, assignee := range list {
-			list[idx] = strings.Trim(assignee, " ")
+			for idx, item := range list {
+				list[idx] = strings.Trim(item, " ")
+			}
 		}
 	}
 
