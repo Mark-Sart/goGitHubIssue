@@ -5,27 +5,22 @@ import (
 	"goGitHubIssue/pkg/consoleIO"
 	"io"
 	"log"
+	"os/exec"
 	"strings"
 )
 
 // getCreateIssueModelJSON Подготавливает JSON для создания issue
-func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (io.Reader, error) {
+func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner, cmd *exec.Cmd) (io.Reader, error) {
 	// Переменные
-	var title, body string
+	var title, description string
 	var milestone int
 	var milestoneOK, milestoneNeed bool
 	var labels, assignees []string
 
-	// Редактор
-	cmd, err := consoleIO.InitEditor()
-	if err != nil {
-		return nil, err
-	}
-
 	// Title
 	title = consoleIO.ReadString("Введите заголовок:", scanner)
 	// Body
-	body, err = consoleIO.ReadByEditor(cmd, "Сюда введите содержимое")
+	description, err := consoleIO.ReadByEditor(cmd, "Сюда введите содержимое")
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +66,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 	if milestoneNeed {
 		createIssueModel := CreateIssueWithMilestoneModel{}
 		createIssueModel.Title = title
-		createIssueModel.Body = body
+		createIssueModel.Description = description
 		createIssueModel.Labels = labels
 		createIssueModel.Assignees = assignees
 		createIssueModel.Milestone = milestone
@@ -80,7 +75,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 	} else {
 		createIssueModel := CreateIssueModel{}
 		createIssueModel.Title = title
-		createIssueModel.Body = body
+		createIssueModel.Description = description
 		createIssueModel.Labels = labels
 		createIssueModel.Assignees = assignees
 

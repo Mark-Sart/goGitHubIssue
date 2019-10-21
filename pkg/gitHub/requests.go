@@ -8,15 +8,16 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os/exec"
 )
 
 const baseURL = "https://api.github.com/repos"
 
 // CreateIssue Создает issue
-func CreateIssue(credentials Credentials, scanner *bufio.Scanner) (*http.Response, error) {
+func CreateIssue(credentials Credentials, scanner *bufio.Scanner, cmd *exec.Cmd) (*http.Response, error) {
 	url := fmt.Sprintf("%s/%s/%s/issues", baseURL, credentials.Owner, credentials.Repo)
 
-	body, err := getCreateIssueModelJSON(credentials, scanner)
+	body, err := getCreateIssueModelJSON(credentials, scanner, cmd)
 	if err != nil {
 		return nil, err
 	}

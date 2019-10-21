@@ -2,10 +2,10 @@ package gitHub
 
 //baseIssueModel Базовая модель для создания и обновления Issue
 type baseIssueModel struct {
-	Title     string   `json:"title"`
-	Body      string   `json:"body"`
-	Labels    []string `json:"labels"`
-	Assignees []string `json:"assignees"`
+	Title       string   `json:"title"`
+	Description string   `json:"body"`
+	Labels      []string `json:"labels"`
+	Assignees   []string `json:"assignees"`
 }
 
 // CreateIssueModel Модель для создания Issue
