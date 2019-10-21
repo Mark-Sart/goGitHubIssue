@@ -2,16 +2,16 @@ package gitHub
 
 import (
 	"bufio"
-	"fmt"
 	"goGitHubIssue/pkg/consoleIO"
 	"io"
+	"log"
 )
 
 // getMilestoneModelJSON Подготавливает JSON для создания milestone
 func getMilestoneModelJSON(scanner *bufio.Scanner) (io.Reader, error) {
 	milestone := MilestoneModel{}
 
-	fmt.Println("Начинаю наполнять  milestone")
+	log.Println("Начинаю наполнять  milestone")
 	// Title
 	milestone.Title = consoleIO.ReadString("Введите название", scanner)
 	// State
