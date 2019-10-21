@@ -47,11 +47,15 @@ func main() {
 		log.Fatal("Не был введен access-token")
 	}
 
-	// Данные о репозитории
-	credentials := gitHub.Credentials{
-		Owner: *owner,
-		Repo:  *repo,
-		Token: token,
+	// Контекст
+	context := &gitHub.Context{
+		Credentials: gitHub.Credentials{
+			Owner: *owner,
+			Repo:  *repo,
+			Token: token,
+		},
+		Scanner: scanner,
+		Cmd:     cmd,
 	}
 
 	// Ответ
@@ -60,7 +64,7 @@ func main() {
 	// Логика
 	switch *mode {
 	case "create":
-		response, err = gitHub.CreateIssue(credentials, scanner, cmd)
+		response, err = gitHub.CreateIssue(context)
 		if err != nil {
 			log.Fatal(err)
 		}

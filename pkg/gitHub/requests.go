@@ -1,35 +1,39 @@
 package gitHub
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"os/exec"
 )
 
 const baseURL = "https://api.github.com/repos"
 
 // CreateIssue Создает issue
-func CreateIssue(credentials Credentials, scanner *bufio.Scanner, cmd *exec.Cmd) (*http.Response, error) {
-	url := fmt.Sprintf("%s/%s/%s/issues", baseURL, credentials.Owner, credentials.Repo)
+func CreateIssue(context *Context) (*http.Response, error) {
+	url := fmt.Sprintf("%s/%s/%s/issues", baseURL, context.Credentials.Owner, context.Credentials.Repo)
 
-	body, err := getCreateIssueModelJSON(credentials, scanner, cmd)
+	body, err := getCreateIssueModelJSON(context)
 	if err != nil {
 		return nil, err
 	}
 
-	return doRequest(http.MethodPost, url, credentials.Token, body)
+	return doRequest(http.MethodPost, url, context.Credentials.Token, body)
 }
 
 // checkMilestone Чекает наличия milestone у репозитория
-func checkMilestone(credentials Credentials, milestone int) (bool, error) {
-	url := fmt.Sprintf("%s/%s/%s/milestones/%d", baseURL, credentials.Owner, credentials.Repo, milestone)
+func checkMilestone(context *Context, milestone int) (bool, error) {
+	url := fmt.Sprintf(
+		"%s/%s/%s/milestones/%d",
+		baseURL,
+		context.Credentials.Owner,
+		context.Credentials.Repo,
+		milestone,
+	)
 
-	response, err := doRequest(http.MethodGet, url, credentials.Token, nil)
+	response, err := doRequest(http.MethodGet, url, context.Credentials.Token, nil)
 	if err != nil {
 		return false, err
 	}
@@ -42,7 +46,7 @@ func checkMilestone(credentials Credentials, milestone int) (bool, error) {
 }
 
 // createMilestone Создает milestone
-func createMilestone(credentials Credentials) (int, error) {
+func createMilestone(context *Context) (int, error) {
 	return 0, nil
 }
 

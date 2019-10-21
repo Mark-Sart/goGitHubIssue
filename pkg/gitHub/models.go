@@ -1,5 +1,10 @@
 package gitHub
 
+import (
+	"bufio"
+	"os/exec"
+)
+
 //baseIssueModel Базовая модель для создания и обновления Issue
 type baseIssueModel struct {
 	Title       string   `json:"title"`
@@ -24,6 +29,13 @@ type Credentials struct {
 	Owner string
 	Repo  string
 	Token string
+}
+
+// Context Модель контекста, гуляющего по всем функциям
+type Context struct {
+	Credentials Credentials
+	Scanner     *bufio.Scanner
+	Cmd         *exec.Cmd
 }
 
 // MilestoneModel Модель для создания milestone

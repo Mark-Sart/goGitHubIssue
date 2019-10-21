@@ -1,24 +1,22 @@
 package gitHub
 
 import (
-	"bufio"
 	"goGitHubIssue/pkg/consoleIO"
 	"io"
 	"log"
-	"os/exec"
 )
 
 // getMilestoneModelJSON Подготавливает JSON для создания milestone
-func getMilestoneModelJSON(scanner *bufio.Scanner, cmd *exec.Cmd) (io.Reader, error) {
+func getMilestoneModelJSON(context *Context) (io.Reader, error) {
 	milestone := MilestoneModel{}
 
 	log.Println("Начинаю наполнять  milestone")
 	// Title
-	milestone.Title = consoleIO.ReadString("Введите название", scanner)
+	milestone.Title = consoleIO.ReadString("Введите название", context.Scanner)
 	// State
 	state := ""
 	for {
-		state = consoleIO.ReadString("Введите статус: open/close:", scanner)
+		state = consoleIO.ReadString("Введите статус: open/close:", context.Scanner)
 		if state == "open" || state == "close" {
 			break
 		}
@@ -28,7 +26,7 @@ func getMilestoneModelJSON(scanner *bufio.Scanner, cmd *exec.Cmd) (io.Reader, er
 
 	milestone.State = state
 	// Description
-	description, err := consoleIO.ReadByEditor(cmd, "Сюда введите содержимое")
+	description, err := consoleIO.ReadByEditor(context.Cmd, "Сюда введите содержимое")
 	if err != nil {
 		return nil, err
 	}
