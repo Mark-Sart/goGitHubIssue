@@ -2,6 +2,8 @@ package gitHub
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -66,4 +68,18 @@ func doRequest(method, url, token string, body io.Reader) (*http.Response, error
 	log.Println("Ответ получен")
 
 	return response, nil
+}
+
+// convertStructToJSON Конвертирует структуру в JSON-reader
+func convertStructToJSON(structure interface{}) (io.Reader, error) {
+	// Кодируем в JSON
+	issueJSON, err := json.Marshal(structure)
+	if err != nil {
+		return nil, err
+	}
+
+	// Создаем ридер
+	reader := bytes.NewReader(issueJSON)
+
+	return reader, nil
 }

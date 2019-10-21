@@ -2,8 +2,6 @@ package gitHub
 
 import (
 	"bufio"
-	"bytes"
-	"encoding/json"
 	"goGitHubIssue/pkg/consoleIO"
 	"io"
 	"log"
@@ -78,7 +76,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 		createIssueModel.Assignees = assignees
 		createIssueModel.Milestone = milestone
 
-		return structToJSON(createIssueModel)
+		return convertStructToJSON(createIssueModel)
 	} else {
 		createIssueModel := CreateIssueModel{}
 		createIssueModel.Title = title
@@ -86,37 +84,6 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 		createIssueModel.Labels = labels
 		createIssueModel.Assignees = assignees
 
-		return structToJSON(createIssueModel)
+		return convertStructToJSON(createIssueModel)
 	}
-}
-
-//func getMilestoneModelJSON(scanner *bufio.Scanner) (*MilestoneModel, error) {
-//	var err error
-//	milestone := MilestoneModel{}
-//
-//	fmt.Println("Начинаю наполнять  milestone")
-//	// Title
-//	milestone.Title = consoleIO.ReadString("Введите название", scanner)
-//	// State
-//	state := ""
-//	for state != "open" && state != "close" {
-//		state = consoleIO.ReadString("Введите статус: open/close:", scanner)
-//	}
-//
-//	milestone.State = state
-//
-//}
-
-// structToJSON Конвертирует структуру в JSON-reader
-func structToJSON(structure interface{}) (io.Reader, error) {
-	// Кодируем в JSON
-	issueJSON, err := json.Marshal(structure)
-	if err != nil {
-		return nil, err
-	}
-
-	// Создаем ридер
-	reader := bytes.NewReader(issueJSON)
-
-	return reader, nil
 }
