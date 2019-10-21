@@ -66,8 +66,8 @@ func ReadList(label string, scanner *bufio.Scanner) []string {
 	return list
 }
 
-// InitEditor Настраивает редактор
-func InitEditor() (*exec.Cmd, error) {
+// initEditor Настраивает редактор
+func initEditor() (*exec.Cmd, error) {
 	// Выбираем редактор
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
@@ -90,9 +90,15 @@ func InitEditor() (*exec.Cmd, error) {
 }
 
 // ReadByEditor Считывает текст через редактор
-func ReadByEditor(cmd *exec.Cmd, label string) (string, error) {
+func ReadByEditor(label string) (string, error) {
+	// Инициализируем cmd
+	cmd, err := initEditor()
+	if err != nil {
+		return "", err
+	}
+
 	// Создаем временный файл
-	err := ioutil.WriteFile(filename, []byte(label), 0755)
+	err = ioutil.WriteFile(filename, []byte(label), 0755)
 	if err != nil {
 		return "", err
 	}
