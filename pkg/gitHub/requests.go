@@ -1,6 +1,7 @@
 package gitHub
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -12,31 +13,42 @@ import (
 const baseURL = "https://api.github.com/repos"
 
 // CreateIssue Создает issue
-func CreateIssue(context *Context) (*http.Response, error) {
-	url := fmt.Sprintf("%s/%s/%s/issues", baseURL, context.Credentials.Owner, context.Credentials.Repo)
+func CreateIssue(credentials Credentials, scanner *bufio.Scanner) (int, error) {
+	url := fmt.Sprintf("%s/%s/%s/issues", baseURL, credentials.Owner, credentials.Repo)
 
-	body, err := getCreateIssueModelJSON(context)
+	body, err := getCreateIssueModelJSON(credentials, scanner)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
-	return doRequest(http.MethodPost, url, context.Credentials.Token, body)
+	response, err := doRequest(http.MethodPost, url, credentials.Token, body)
+	if err != nil {
+		return 0, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode == http.StatusCreated {
+		issueNumber := &number{}
+		err = json.NewDecoder(response.Body).Decode(issueNumber)
+		if err != nil {
+			return 0, err
+		}
+
+		return issueNumber.Value, nil
+	}
+
+	return 0, fmt.Errorf(response.Status)
 }
 
 // checkMilestone Чекает наличия milestone у репозитория
-func checkMilestone(context *Context, milestone int) (bool, error) {
-	url := fmt.Sprintf(
-		"%s/%s/%s/milestones/%d",
-		baseURL,
-		context.Credentials.Owner,
-		context.Credentials.Repo,
-		milestone,
-	)
+func checkMilestone(credentials Credentials, milestone int) (bool, error) {
+	url := fmt.Sprintf("%s/%s/%s/milestones/%d", baseURL, credentials.Owner, credentials.Repo, milestone)
 
-	response, err := doRequest(http.MethodGet, url, context.Credentials.Token, nil)
+	response, err := doRequest(http.MethodGet, url, credentials.Token, nil)
 	if err != nil {
 		return false, err
 	}
+	defer response.Body.Close()
 
 	if response.StatusCode == http.StatusOK {
 		return true, nil
@@ -46,8 +58,31 @@ func checkMilestone(context *Context, milestone int) (bool, error) {
 }
 
 // createMilestone Создает milestone
-func createMilestone(context *Context) (int, error) {
-	return 0, nil
+func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, error) {
+	url := fmt.Sprintf("%s/%s/%s/milestones", baseURL, credentials.Owner, credentials.Repo)
+
+	body, err := getMilestoneModelJSON(scanner)
+	if err != nil {
+		return 0, err
+	}
+
+	response, err := doRequest(http.MethodPost, url, credentials.Token, body)
+	if err != nil {
+		return 0, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode == http.StatusCreated {
+		milestoneNumber := &number{}
+		err = json.NewDecoder(response.Body).Decode(milestoneNumber)
+		if err != nil {
+			return 0, err
+		}
+
+		return milestoneNumber.Value, nil
+	}
+
+	return 0, fmt.Errorf(response.Status)
 }
 
 // doRequest Выполняет запрос

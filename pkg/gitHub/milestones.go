@@ -1,37 +1,60 @@
 package gitHub
 
 import (
+	"bufio"
+	"fmt"
 	"goGitHubIssue/pkg/consoleIO"
 	"io"
 	"log"
+	"time"
 )
 
 // getMilestoneModelJSON Подготавливает JSON для создания milestone
-func getMilestoneModelJSON(context *Context) (io.Reader, error) {
-	milestone := MilestoneModel{}
+func getMilestoneModelJSON(scanner *bufio.Scanner) (io.Reader, error) {
+	milestone := milestoneModel{}
 
 	log.Println("Начинаю наполнять  milestone")
 	// Title
-	milestone.Title = consoleIO.ReadString("Введите название", context.Scanner)
+	milestone.Title = consoleIO.ReadString("Введите название", scanner)
 	// State
 	state := ""
 	for {
-		state = consoleIO.ReadString("Введите статус: open/close:", context.Scanner)
+		state = consoleIO.ReadString("Введите статус: open/close:", scanner)
 		if state == "open" || state == "close" {
 			break
 		}
 
-		log.Printf("Введен некорректный статус. возможны только %q и %q\n", "open", "close")
+		log.Printf("Введен некорректный статус. Возможны только %q и %q\n", "open", "close")
 	}
 
 	milestone.State = state
 	// Description
-	description, err := consoleIO.ReadByEditor(context.Cmd, "Сюда введите содержимое")
+	description, err := consoleIO.ReadByEditor("Сюда введите описание")
 	if err != nil {
 		return nil, err
 	}
 
 	milestone.Description = description
+	// Due on
+	dueOn := ""
+	for {
+		dueOn = consoleIO.ReadString(
+			fmt.Sprintf("Введите дату и время окончания в формате %q:", "2019-10-21 19:25:00"),
+			scanner,
+		)
+
+		var date time.Time
+		date, err = time.Parse("2006-01-02 15:04:05", dueOn)
+		if err == nil {
+			dueOn = date.Format("2006-01-02T15:04:05Z")
+
+			break
+		}
+
+		log.Printf("Введена некорректная дата. Неободимый формат: %q", "2019-10-21 19:25:00")
+	}
+
+	milestone.DueOn = dueOn
 
 	return convertStructToJSON(milestone)
 }

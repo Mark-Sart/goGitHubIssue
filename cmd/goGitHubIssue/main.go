@@ -7,7 +7,6 @@ import (
 	"goGitHubIssue/pkg/consoleIO"
 	"goGitHubIssue/pkg/gitHub"
 	"log"
-	"net/http"
 	"os"
 )
 
@@ -35,39 +34,28 @@ func main() {
 	// Сканер
 	scanner := bufio.NewScanner(os.Stdin)
 
-	// Редактор
-	cmd, err := consoleIO.InitEditor()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	// Access-token
 	token := consoleIO.ReadString("Введите access-token:", scanner)
 	if token == "" {
 		log.Fatal("Не был введен access-token")
 	}
 
-	// Контекст
-	context := &gitHub.Context{
-		Credentials: gitHub.Credentials{
-			Owner: *owner,
-			Repo:  *repo,
-			Token: token,
-		},
-		Scanner: scanner,
-		Cmd:     cmd,
+	// Пользовательские данные
+	credentials := gitHub.Credentials{
+		Owner: *owner,
+		Repo:  *repo,
+		Token: token,
 	}
-
-	// Ответ
-	var response *http.Response
 
 	// Логика
 	switch *mode {
 	case "create":
-		response, err = gitHub.CreateIssue(context)
+		number, err := gitHub.CreateIssue(credentials, scanner)
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		log.Printf("Создано issue № %d", number)
 
 	default:
 		fmt.Println("Доступны только следующие операции:")
@@ -75,7 +63,4 @@ func main() {
 
 		return
 	}
-
-	// Печатаем результат
-	fmt.Println(response)
 }
