@@ -34,7 +34,7 @@ type milestoneModel struct {
 	DueOn       string `json:"due_on"`
 }
 
-// number Модель для получения номера созданного объекта
-type number struct {
+// numberModel Модель для получения номера созданного объекта
+type numberModel struct {
 	Value int `json:"number"`
 }

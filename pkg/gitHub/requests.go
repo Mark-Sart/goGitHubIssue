@@ -16,11 +16,13 @@ const baseURL = "https://api.github.com/repos"
 func CreateIssue(credentials Credentials, scanner *bufio.Scanner) (int, error) {
 	url := fmt.Sprintf("%s/%s/%s/issues", baseURL, credentials.Owner, credentials.Repo)
 
+	log.Println("Начинаю наполнять модель issue")
 	body, err := getCreateIssueModelJSON(credentials, scanner)
 	if err != nil {
 		return 0, err
 	}
 
+	log.Println("Создаю issue")
 	response, err := doRequest(http.MethodPost, url, credentials.Token, body)
 	if err != nil {
 		return 0, err
@@ -28,7 +30,7 @@ func CreateIssue(credentials Credentials, scanner *bufio.Scanner) (int, error) {
 	defer response.Body.Close()
 
 	if response.StatusCode == http.StatusCreated {
-		issueNumber := &number{}
+		issueNumber := &numberModel{}
 		err = json.NewDecoder(response.Body).Decode(issueNumber)
 		if err != nil {
 			return 0, err
@@ -61,11 +63,13 @@ func checkMilestone(credentials Credentials, milestone int) (bool, error) {
 func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, error) {
 	url := fmt.Sprintf("%s/%s/%s/milestones", baseURL, credentials.Owner, credentials.Repo)
 
+	log.Println("Начинаю наполнять модель milestone")
 	body, err := getMilestoneModelJSON(scanner)
 	if err != nil {
 		return 0, err
 	}
 
+	log.Println("Создаю milestone")
 	response, err := doRequest(http.MethodPost, url, credentials.Token, body)
 	if err != nil {
 		return 0, err
@@ -73,7 +77,7 @@ func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, erro
 	defer response.Body.Close()
 
 	if response.StatusCode == http.StatusCreated {
-		milestoneNumber := &number{}
+		milestoneNumber := &numberModel{}
 		err = json.NewDecoder(response.Body).Decode(milestoneNumber)
 		if err != nil {
 			return 0, err
@@ -87,7 +91,6 @@ func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, erro
 
 // doRequest Выполняет запрос
 func doRequest(method, url, token string, body io.Reader) (*http.Response, error) {
-	log.Println("Подготавливаю запрос")
 	// Собираем запрос
 	request, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -98,14 +101,11 @@ func doRequest(method, url, token string, body io.Reader) (*http.Response, error
 	request.Header.Add("Authorization", fmt.Sprintf("token %s", token))
 
 	// Отсылаем запрос
-	log.Println("Отсылаю запрос")
 	client := http.DefaultClient
 	response, err := client.Do(request)
 	if err != nil {
 		return nil, err
 	}
-
-	log.Println("Ответ получен")
 
 	return response, nil
 }

@@ -2,6 +2,7 @@ package gitHub
 
 import (
 	"bufio"
+	"fmt"
 	"goGitHubIssue/pkg/consoleIO"
 	"io"
 	"log"
@@ -42,6 +43,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 
 		// Чекаем milestone, если он нужен
 		if milestoneNeed && milestoneOK {
+			log.Printf("Проверяю milestone № %d\n", milestone)
 			milestoneOK, err = checkMilestone(credentials, milestone)
 			if err != nil {
 				return nil, err
@@ -50,7 +52,10 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 
 		// Если не существует milestone, а он нужен, то создаем
 		if milestoneNeed && !milestoneOK {
-			answer := consoleIO.ReadString("Данного milestone не существует. Создать новый? (Y/n)", scanner)
+			answer := consoleIO.ReadString(
+				fmt.Sprintf("Milestone № %d не существует. Создать новый? (Y/n)", milestone),
+				scanner,
+			)
 			answer = strings.ToLower(answer)
 			if answer == "y" || answer == "" {
 				milestone, err = createMilestone(credentials, scanner)

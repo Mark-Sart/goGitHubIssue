@@ -12,22 +12,10 @@ import (
 // getMilestoneModelJSON Подготавливает JSON для создания milestone
 func getMilestoneModelJSON(scanner *bufio.Scanner) (io.Reader, error) {
 	milestone := milestoneModel{}
-
-	log.Println("Начинаю наполнять  milestone")
 	// Title
 	milestone.Title = consoleIO.ReadString("Введите название", scanner)
 	// State
-	state := ""
-	for {
-		state = consoleIO.ReadString("Введите статус: open/close:", scanner)
-		if state == "open" || state == "close" {
-			break
-		}
-
-		log.Printf("Введен некорректный статус. Возможны только %q и %q\n", "open", "close")
-	}
-
-	milestone.State = state
+	milestone.State = "open"
 	// Description
 	description, err := consoleIO.ReadByEditor("Сюда введите описание")
 	if err != nil {

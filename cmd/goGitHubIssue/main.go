@@ -55,7 +55,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		log.Printf("Создано issue № %d", number)
+		log.Printf("Создан issue № %d", number)
 
 	default:
 		fmt.Println("Доступны только следующие операции:")
