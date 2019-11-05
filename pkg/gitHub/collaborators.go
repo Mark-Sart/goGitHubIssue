@@ -34,7 +34,7 @@ func assignCollaborators(credentials Credentials, users []string) ([]string, err
 // multiRequests Мультизапросы
 func multiRequests(credentials Credentials, users []string, operation int) ([]string, error) {
 	ch := make(chan operationCollaboratorsModel)
-	var correctUsers []string
+	var correctUsers = make([]string, 0)
 
 	for _, user := range users {
 		go multiRequestHandler(ch, credentials, user, operation)
@@ -57,7 +57,6 @@ func multiRequests(credentials Credentials, users []string, operation int) ([]st
 
 // multiRequestHandler Обработчик мультизапросов
 func multiRequestHandler(ch chan operationCollaboratorsModel, credentials Credentials, user string, operation int) {
-	log.Printf("Проверяю %s\n", user)
 	operationStatus := operationCollaboratorsModel{
 		name: user,
 	}
@@ -67,6 +66,7 @@ func multiRequestHandler(ch chan operationCollaboratorsModel, credentials Creden
 
 	switch operation {
 	case checkCollaboratorConst:
+		log.Printf("Проверяю %s\n", user)
 		if user == credentials.Owner {
 			status, err = true, nil
 		} else {
@@ -74,6 +74,7 @@ func multiRequestHandler(ch chan operationCollaboratorsModel, credentials Creden
 		}
 
 	case checkUserConst:
+		log.Printf("Проверяю %s\n", user)
 		status, err = checkUser(credentials, user)
 
 	case assignCollaboratorConst:
@@ -83,6 +84,7 @@ func multiRequestHandler(ch chan operationCollaboratorsModel, credentials Creden
 			break
 		}
 
+		log.Printf("Назначаю %s\n", user)
 		status, err = assignCollaborator(credentials, user, body)
 
 	default:

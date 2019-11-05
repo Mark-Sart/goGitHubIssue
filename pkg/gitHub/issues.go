@@ -16,7 +16,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 	var milestone int
 	var milestoneOK, milestoneNeed bool
 	var labels []string
-	var collaborators, correctCollaborators []string
+	var collaborators []string
 
 	// Заголовок
 	title = consoleIO.ReadString("Введите заголовок:", scanner)
@@ -33,6 +33,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 	// Ответственные
 	collaborators = consoleIO.ReadList("Введите коллабораторов через запятую:", scanner)
 	if len(collaborators) > 0 {
+		var correctCollaborators []string
 		var users, correctUsers, incorrectUsers []string
 
 		log.Println("Начинаю проверять коллабораторов")
@@ -52,7 +53,9 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 					incorrectUsers = getSliceDiff(users, correctUsers)
 					usersToCollaborators = append(usersToCollaborators, correctUsers...)
 
-					log.Printf("Следующие юзеры будут назначены коллабораторами: %s\n", usersToCollaborators)
+					if len(usersToCollaborators) > 0 {
+						log.Printf("Следующие юзеры будут назначены коллабораторами: %s\n", usersToCollaborators)
+					}
 
 					if len(incorrectUsers) > 0 {
 						log.Printf("Не найдены следующие users: %s\n", incorrectUsers)
@@ -61,27 +64,32 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 						answer = strings.ToLower(answer)
 						if answer == "y" || answer == "" {
 							users = consoleIO.ReadList("Введите юзеров через запятую", scanner)
-						} else {
-							break
+
+							continue
 						}
 					}
+
+					break
 				}
 
-				var newCollaborators []string
-				newCollaborators, err = assignCollaborators(credentials, usersToCollaborators)
-				if err != nil {
-					return nil, err
-				}
+				if len(usersToCollaborators) > 0 {
+					var newCollaborators []string
+					newCollaborators, err = assignCollaborators(credentials, usersToCollaborators)
+					if err != nil {
+						return nil, err
+					}
 
-				if len(newCollaborators) != len(usersToCollaborators) {
-					return nil, fmt.Errorf("что-то пошло не так")
-				}
+					if len(newCollaborators) != len(usersToCollaborators) {
+						return nil, fmt.Errorf("что-то пошло не так")
+					}
 
-				return nil, fmt.Errorf("отправлены приглашения юзерам %s стать коллабораторами, но создание "+
-					"issue невозможно, пока не будут приняты все приглашения", newCollaborators)
+					return nil, fmt.Errorf("отправлены приглашения юзерам %s стать коллабораторами, но создание "+
+						"issue невозможно, пока не будут приняты все приглашения", newCollaborators)
+				}
 			}
 		}
 
+		collaborators = correctCollaborators
 		log.Println("Все коллабораторы корректны")
 	}
 
@@ -140,7 +148,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 		issue.Title = title
 		issue.Description = description
 		issue.Labels = labels
-		issue.Assignees = correctCollaborators
+		issue.Assignees = collaborators
 		issue.Milestone = milestone
 
 		return convertStructToJSON(issue)
@@ -149,7 +157,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 		issue.Title = title
 		issue.Description = description
 		issue.Labels = labels
-		issue.Assignees = correctCollaborators
+		issue.Assignees = collaborators
 
 		return convertStructToJSON(issue)
 	}
