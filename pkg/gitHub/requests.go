@@ -44,7 +44,7 @@ func CreateIssue(credentials Credentials, scanner *bufio.Scanner) (int, error) {
 	return 0, fmt.Errorf(response.Status)
 }
 
-// checkMilestone Чекает наличия milestone у репозитория
+// checkMilestone Чекает наличия спринта у репозитория
 func checkMilestone(credentials Credentials, milestone int) (bool, error) {
 	url := fmt.Sprintf("%s/%s/%s/%s/milestones/%d", baseURL, repoURL, credentials.Owner, credentials.Repo, milestone)
 
@@ -61,17 +61,17 @@ func checkMilestone(credentials Credentials, milestone int) (bool, error) {
 	return false, nil
 }
 
-// createMilestone Создает milestone
+// createMilestone Создает спринт
 func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, error) {
 	url := fmt.Sprintf("%s/%s/%s/%s/milestones", baseURL, repoURL, credentials.Owner, credentials.Repo)
 
-	log.Println("Начинаю наполнять модель milestone")
+	log.Println("Начинаю наполнять модель спринта")
 	body, err := getMilestoneModelJSON(scanner)
 	if err != nil {
 		return 0, err
 	}
 
-	log.Println("Создаю milestone")
+	log.Println("Создаю спринт")
 	response, err := doRequest(http.MethodPost, url, credentials.Token, body)
 	if err != nil {
 		return 0, err
@@ -91,7 +91,7 @@ func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, erro
 	return 0, fmt.Errorf(response.Status)
 }
 
-// checkCollaborator Чекает наличие collaborator
+// checkCollaborator Чекает наличие коллаборатора
 func checkCollaborator(credentials Credentials, collaborator string) (bool, error) {
 	url := fmt.Sprintf("%s/%s/%s/%s/%s", baseURL, repoURL, credentials.Owner, credentials.Repo, collaborator)
 
@@ -107,7 +107,7 @@ func checkCollaborator(credentials Credentials, collaborator string) (bool, erro
 	return false, nil
 }
 
-// checkUser Чекает наличие user
+// checkUser Чекает наличие юзера
 func checkUser(credentials Credentials, user string) (bool, error) {
 	url := fmt.Sprintf("%s/%s/%s", baseURL, userURL, user)
 
@@ -123,7 +123,7 @@ func checkUser(credentials Credentials, user string) (bool, error) {
 	return false, nil
 }
 
-// assignCollaborator Добавляет user в collaborator
+// assignCollaborator Делает юзера коллаборатором
 func assignCollaborator(credentials Credentials, user string, body io.Reader) (bool, error) {
 	url := fmt.Sprintf(
 		"%s/%s/%s/%s/collaborators/%s",

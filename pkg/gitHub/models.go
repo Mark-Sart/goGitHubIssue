@@ -13,7 +13,7 @@ type createIssueModel struct {
 	baseIssueModel
 }
 
-// createIssueWithMilestoneModel Модель для создания Issue с вехой
+// createIssueWithMilestoneModel Модель для создания Issue со спринтом
 type createIssueWithMilestoneModel struct {
 	baseIssueModel
 	Milestone int `json:"milestone"`
@@ -26,7 +26,7 @@ type Credentials struct {
 	Token string
 }
 
-// milestoneModel Модель для создания milestone
+// milestoneModel Модель для создания спринта
 type milestoneModel struct {
 	Title       string `json:"title"`
 	State       string `json:"state"`
@@ -39,15 +39,15 @@ type numberModel struct {
 	Value int `json:"number"`
 }
 
-// operationCollaboratorsModel Модель для выполнение операции по проверки user/collaborators
-// или назначению collaborators
+// operationCollaboratorsModel Модель для выполнение операции по проверки юзера/коллаборатора
+// или по назначению юзера коллаборатором
 type operationCollaboratorsModel struct {
 	name   string
 	status bool
 	err    error
 }
 
-// collaboratorModel Модель для назначения collaborator
+// collaboratorModel Модель для назначения юзера коллаборатором (тело запроса)
 type collaboratorModel struct {
 	permission string
 }

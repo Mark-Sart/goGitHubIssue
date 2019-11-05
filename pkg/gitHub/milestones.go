@@ -9,21 +9,24 @@ import (
 	"time"
 )
 
-// getMilestoneModelJSON Подготавливает JSON для создания milestone
+// getMilestoneModelJSON Подготавливает JSON для создания спринта
 func getMilestoneModelJSON(scanner *bufio.Scanner) (io.Reader, error) {
 	milestone := milestoneModel{}
-	// Title
+
+	// Заголовок
 	milestone.Title = consoleIO.ReadString("Введите название", scanner)
-	// State
+
+	// Состояние
 	milestone.State = "open"
-	// Description
+
+	// Описание
 	description, err := consoleIO.ReadByEditor("Сюда введите описание")
 	if err != nil {
 		return nil, err
 	}
-
 	milestone.Description = description
-	// Due on
+
+	// Дата окончания
 	dueOn := ""
 	for {
 		dueOn = consoleIO.ReadString(

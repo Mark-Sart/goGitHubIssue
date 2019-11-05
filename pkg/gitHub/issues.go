@@ -15,11 +15,13 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 	var title, description string
 	var milestone int
 	var milestoneOK, milestoneNeed bool
-	var labels, assignees []string
+	var labels []string
+	var collaborators, correctCollaborators []string
 
-	// Title
+	// Заголовок
 	title = consoleIO.ReadString("Введите заголовок:", scanner)
-	// Description
+
+	// Описание
 	description, err := consoleIO.ReadByEditor("Сюда введите описание")
 	if err != nil {
 		return nil, err
@@ -31,7 +33,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 
 	// Milestone
 	for {
-		milestone, err = consoleIO.ReadInt("Введите milestone:", scanner)
+		milestone, err = consoleIO.ReadInt("Введите номер спринта:", scanner)
 		if err == nil {
 			milestoneNeed, milestoneOK = true, true
 		} else if err == io.EOF {
@@ -41,19 +43,19 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 			log.Println(err)
 		}
 
-		// Чекаем milestone, если он нужен
+		// Чекаем спринт, если он нужен
 		if milestoneNeed && milestoneOK {
-			log.Printf("Проверяю milestone № %d\n", milestone)
+			log.Printf("Проверяю спринт № %d\n", milestone)
 			milestoneOK, err = checkMilestone(credentials, milestone)
 			if err != nil {
 				return nil, err
 			}
 		}
 
-		// Если не существует milestone, а он нужен, то создаем
+		// Если спринт не существует, а он нужен, то создаем
 		if milestoneNeed && !milestoneOK {
 			answer := consoleIO.ReadString(
-				fmt.Sprintf("Milestone № %d не существует. Создать новый? (Y/n)", milestone),
+				fmt.Sprintf("Спринт № %d не существует. Создать новый? (Y/n)", milestone),
 				scanner,
 			)
 			answer = strings.ToLower(answer)
@@ -63,10 +65,10 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 					return nil, err
 				}
 
-				log.Printf("Создан milestone № %d", milestone)
+				log.Printf("Создан спринт № %d", milestone)
 				milestoneOK = true
 			} else {
-				answer = consoleIO.ReadString("Использовать другой milestone? (Y/n)", scanner)
+				answer = consoleIO.ReadString("Использовать другой спринт? (Y/n)", scanner)
 				answer = strings.ToLower(answer)
 				if answer == "n" {
 					milestoneNeed = false

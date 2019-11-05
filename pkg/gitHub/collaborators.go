@@ -7,26 +7,26 @@ import (
 	"sort"
 )
 
-// Проверка collaborator
+// Проверка коллаборатора
 const checkCollaboratorConst = 0
 
-// Проверка user
+// Проверка юзера
 const checkUserConst = 1
 
-// Назначение collaborator
+// Назначение юзера коллаборатором
 const assignCollaboratorConst = 2
 
-// checkUsers Чекает каждого user и возвращает корректных
+// checkUsers Чекает каждого юзера и возвращает корректных
 func checkUsers(credentials Credentials, users []string) ([]string, error) {
 	return multiRequests(credentials, users, checkUserConst)
 }
 
-// checkCollaborators Чекает каждого collaborator и возвращает корректных
+// checkCollaborators Чекает каждого коллаборатора и возвращает корректных
 func checkCollaborators(credentials Credentials, collaborators []string) ([]string, error) {
 	return multiRequests(credentials, collaborators, checkCollaboratorConst)
 }
 
-// assignCollaborators Назначает collaborators
+// assignCollaborators Назначает юзеров коллабораторами
 func assignCollaborators(credentials Credentials, users []string) ([]string, error) {
 	return multiRequests(credentials, users, assignCollaboratorConst)
 }
@@ -100,7 +100,7 @@ func multiRequestHandler(ch chan operationCollaboratorsModel, credentials Creden
 	ch <- operationStatus
 }
 
-// getCollaboratorModel Подготавливает JSON для назначения Collaborator
+// getCollaboratorModel Подготавливает JSON для назначения юзера коллаборатором
 func getCollaboratorModel() (io.Reader, error) {
 	collaborator := collaboratorModel{
 		permission: "push",
