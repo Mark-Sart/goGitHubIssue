@@ -26,12 +26,66 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 	if err != nil {
 		return nil, err
 	}
-	// Labels
-	labels = consoleIO.ReadList("Введите labels через запятую:", scanner)
-	// Assignees
-	assignees = consoleIO.ReadList("Введите assignees через запятую:", scanner)
 
-	// Milestone
+	// Метки
+	labels = consoleIO.ReadList("Введите метки через запятую:", scanner)
+
+	// Ответственные
+	collaborators = consoleIO.ReadList("Введите коллабораторов через запятую:", scanner)
+	if len(collaborators) > 0 {
+		var users, correctUsers, incorrectUsers []string
+
+		log.Println("Начинаю проверять коллабораторов")
+		correctCollaborators, err = checkCollaborators(credentials, collaborators)
+		users = getSliceDiff(collaborators, correctCollaborators)
+
+		if len(users) > 0 {
+			log.Printf("Не найдены следующие коллаборатры: %s\n", users)
+			answer := consoleIO.ReadString("Назначить данных юзеров коллабораторами? (Y/n)", scanner)
+			answer = strings.ToLower(answer)
+			if answer == "y" || answer == "" {
+				var usersToCollaborators []string
+
+				for len(users) > 0 {
+					log.Println("Начинаю проверять юзеров")
+					correctUsers, err = checkUsers(credentials, users)
+					incorrectUsers = getSliceDiff(users, correctUsers)
+					usersToCollaborators = append(usersToCollaborators, correctUsers...)
+
+					log.Printf("Следующие юзеры будут назначены коллабораторами: %s\n", usersToCollaborators)
+
+					if len(incorrectUsers) > 0 {
+						log.Printf("Не найдены следующие users: %s\n", incorrectUsers)
+
+						answer = consoleIO.ReadString("Назначить других users коллабораторами? (Y/n)", scanner)
+						answer = strings.ToLower(answer)
+						if answer == "y" || answer == "" {
+							users = consoleIO.ReadList("Введите юзеров через запятую", scanner)
+						} else {
+							break
+						}
+					}
+				}
+
+				var newCollaborators []string
+				newCollaborators, err = assignCollaborators(credentials, usersToCollaborators)
+				if err != nil {
+					return nil, err
+				}
+
+				if len(newCollaborators) != len(usersToCollaborators) {
+					return nil, fmt.Errorf("что-то пошло не так")
+				}
+
+				return nil, fmt.Errorf("отправлены приглашения юзерам %s стать коллабораторами, но создание "+
+					"issue невозможно, пока не будут приняты все приглашения", newCollaborators)
+			}
+		}
+
+		log.Println("Все коллабораторы корректны")
+	}
+
+	// Спринт
 	for {
 		milestone, err = consoleIO.ReadInt("Введите номер спринта:", scanner)
 		if err == nil {
@@ -86,7 +140,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 		issue.Title = title
 		issue.Description = description
 		issue.Labels = labels
-		issue.Assignees = assignees
+		issue.Assignees = correctCollaborators
 		issue.Milestone = milestone
 
 		return convertStructToJSON(issue)
@@ -95,7 +149,7 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 		issue.Title = title
 		issue.Description = description
 		issue.Labels = labels
-		issue.Assignees = assignees
+		issue.Assignees = correctCollaborators
 
 		return convertStructToJSON(issue)
 	}
