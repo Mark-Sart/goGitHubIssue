@@ -20,15 +20,18 @@ func main() {
 
 	// Проверяем аргументов
 	if *mode == "" {
-		log.Fatal("Не указана операция. Используйте -h для получения подробной информации.")
+		err := fmt.Errorf("не указана операция")
+		errHandler(err)
 	}
 
 	if *owner == "" {
-		log.Fatal("Не указан владелец репозитория. Используйте -h для получения подробной информации.")
+		err := fmt.Errorf("не указан владелец репозитория")
+		errHandler(err)
 	}
 
 	if *repo == "" {
-		log.Fatal("Не указан репозиторий. Используйте -h для получения подробной информации.")
+		err := fmt.Errorf("не указан репозиторий")
+		errHandler(err)
 	}
 
 	// Сканер
@@ -37,7 +40,8 @@ func main() {
 	// Access-token
 	token := consoleIO.ReadString("Введите access-token:", scanner)
 	if token == "" {
-		log.Fatal("Не был введен access-token")
+		err := fmt.Errorf("не был введен access-token")
+		errHandler(err)
 	}
 
 	// Пользовательские данные
@@ -51,9 +55,7 @@ func main() {
 	switch *mode {
 	case "create":
 		number, err := gitHub.CreateIssue(credentials, scanner)
-		if err != nil {
-			log.Fatal(err)
-		}
+		errHandler(err)
 
 		log.Printf("Создан issue № %d", number)
 
@@ -62,5 +64,11 @@ func main() {
 		fmt.Printf("%-10s%-s", "create", "создать issue\n")
 
 		return
+	}
+}
+
+func errHandler(err error) {
+	if err != nil {
+		log.Fatalf("Ошибка: %s\n", err)
 	}
 }
