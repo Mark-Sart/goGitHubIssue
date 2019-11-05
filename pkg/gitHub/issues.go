@@ -40,27 +40,47 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 		correctCollaborators, err = checkCollaborators(credentials, collaborators)
 		users = getSliceDiff(collaborators, correctCollaborators)
 
+		var answer string
 		if len(users) > 0 {
-			log.Printf("Не найдены следующие коллаборатры: %s\n", users)
-			answer := consoleIO.ReadString("Назначить данных юзеров коллабораторами? (Y/n)", scanner)
+			if len(users) == 1 {
+				log.Printf("Не найден следующий коллаборатр: %s\n", users)
+				answer = consoleIO.ReadString("Назначить данного юзера коллаборатором? (Y/n)", scanner)
+			} else {
+				log.Printf("Не найдены следующие коллаборатры: %s\n", users)
+				answer = consoleIO.ReadString("Назначить данных юзеров коллабораторами? (Y/n)", scanner)
+			}
+
 			answer = strings.ToLower(answer)
 			if answer == "y" || answer == "" {
 				var usersToCollaborators []string
 
 				for len(users) > 0 {
-					log.Println("Начинаю проверять юзеров")
+					if len(users) == 1 {
+						log.Println("Начинаю проверять юзера")
+					} else {
+						log.Println("Начинаю проверять юзеров")
+					}
+
 					correctUsers, err = checkUsers(credentials, users)
 					incorrectUsers = getSliceDiff(users, correctUsers)
 					usersToCollaborators = append(usersToCollaborators, correctUsers...)
 
 					if len(usersToCollaborators) > 0 {
-						log.Printf("Следующие юзеры будут назначены коллабораторами: %s\n", usersToCollaborators)
+						if len(usersToCollaborators) == 1 {
+							log.Printf("Следующий юзер будет назначен коллаборатором: %s\n", usersToCollaborators)
+						} else {
+							log.Printf("Следующие юзеры будут назначены коллабораторами: %s\n", usersToCollaborators)
+						}
 					}
 
 					if len(incorrectUsers) > 0 {
-						log.Printf("Не найдены следующие users: %s\n", incorrectUsers)
+						if len(incorrectUsers) == 1 {
+							log.Printf("Не найден следующий юзер: %s\n", incorrectUsers)
+						} else {
+							log.Printf("Не найдены следующие юзеры: %s\n", incorrectUsers)
+						}
 
-						answer = consoleIO.ReadString("Назначить других users коллабораторами? (Y/n)", scanner)
+						answer = consoleIO.ReadString("Назначить других юзеров коллабораторами? (Y/n)", scanner)
 						answer = strings.ToLower(answer)
 						if answer == "y" || answer == "" {
 							users = consoleIO.ReadList("Введите юзеров через запятую", scanner)
@@ -83,8 +103,16 @@ func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (i
 						return nil, fmt.Errorf("что-то пошло не так")
 					}
 
-					return nil, fmt.Errorf("отправлены приглашения юзерам %s стать коллабораторами, но создание "+
-						"issue невозможно, пока не будут приняты все приглашения", newCollaborators)
+					var text string
+					if len(newCollaborators) == 1 {
+						text = "отправлено приглашение юзеру %s стать коллаборатором, но создание " +
+							"issue невозможно, пока приглашение не будет принято"
+					} else {
+						text = "отправлены приглашения юзерам %s стать коллабораторами, но создание " +
+							"issue невозможно, пока не будут приняты все приглашения"
+					}
+
+					return nil, fmt.Errorf(text, newCollaborators)
 				}
 			}
 		}
