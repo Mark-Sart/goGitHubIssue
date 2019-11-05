@@ -38,3 +38,16 @@ type milestoneModel struct {
 type numberModel struct {
 	Value int `json:"number"`
 }
+
+// operationCollaboratorsModel Модель для выполнение операции по проверки user/collaborators
+// или назначению collaborators
+type operationCollaboratorsModel struct {
+	name   string
+	status bool
+	err    error
+}
+
+// collaboratorModel Модель для назначения collaborator
+type collaboratorModel struct {
+	permission string
+}

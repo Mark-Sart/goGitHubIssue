@@ -10,11 +10,13 @@ import (
 	"net/http"
 )
 
-const baseURL = "https://api.github.com/repos"
+const baseURL = "https://api.github.com"
+const repoURL = "repos"
+const userURL = "users"
 
 // CreateIssue Создает issue
 func CreateIssue(credentials Credentials, scanner *bufio.Scanner) (int, error) {
-	url := fmt.Sprintf("%s/%s/%s/issues", baseURL, credentials.Owner, credentials.Repo)
+	url := fmt.Sprintf("%s/%s/%s/%s/issues", baseURL, repoURL, credentials.Owner, credentials.Repo)
 
 	log.Println("Начинаю наполнять модель issue")
 	body, err := getCreateIssueModelJSON(credentials, scanner)
@@ -44,7 +46,7 @@ func CreateIssue(credentials Credentials, scanner *bufio.Scanner) (int, error) {
 
 // checkMilestone Чекает наличия milestone у репозитория
 func checkMilestone(credentials Credentials, milestone int) (bool, error) {
-	url := fmt.Sprintf("%s/%s/%s/milestones/%d", baseURL, credentials.Owner, credentials.Repo, milestone)
+	url := fmt.Sprintf("%s/%s/%s/%s/milestones/%d", baseURL, repoURL, credentials.Owner, credentials.Repo, milestone)
 
 	response, err := doRequest(http.MethodGet, url, credentials.Token, nil)
 	if err != nil {
@@ -61,7 +63,7 @@ func checkMilestone(credentials Credentials, milestone int) (bool, error) {
 
 // createMilestone Создает milestone
 func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, error) {
-	url := fmt.Sprintf("%s/%s/%s/milestones", baseURL, credentials.Owner, credentials.Repo)
+	url := fmt.Sprintf("%s/%s/%s/%s/milestones", baseURL, repoURL, credentials.Owner, credentials.Repo)
 
 	log.Println("Начинаю наполнять модель milestone")
 	body, err := getMilestoneModelJSON(scanner)
@@ -87,6 +89,61 @@ func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, erro
 	}
 
 	return 0, fmt.Errorf(response.Status)
+}
+
+// checkCollaborator Чекает наличие collaborator
+func checkCollaborator(credentials Credentials, collaborator string) (bool, error) {
+	url := fmt.Sprintf("%s/%s/%s/%s/%s", baseURL, repoURL, credentials.Owner, credentials.Repo, collaborator)
+
+	response, err := doRequest(http.MethodGet, url, credentials.Token, nil)
+	if err != nil {
+		return false, err
+	}
+
+	if response.StatusCode == http.StatusNoContent {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+// checkUser Чекает наличие user
+func checkUser(credentials Credentials, user string) (bool, error) {
+	url := fmt.Sprintf("%s/%s/%s", baseURL, userURL, user)
+
+	response, err := doRequest(http.MethodGet, url, credentials.Token, nil)
+	if err != nil {
+		return false, err
+	}
+
+	if response.StatusCode == http.StatusOK {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+// assignCollaborator Добавляет user в collaborator
+func assignCollaborator(credentials Credentials, user string, body io.Reader) (bool, error) {
+	url := fmt.Sprintf(
+		"%s/%s/%s/%s/collaborators/%s",
+		baseURL,
+		repoURL,
+		credentials.Owner,
+		credentials.Repo,
+		user,
+	)
+
+	response, err := doRequest(http.MethodPut, url, credentials.Token, body)
+	if err != nil {
+		return false, err
+	}
+
+	if response.StatusCode == http.StatusNoContent || response.StatusCode == http.StatusCreated {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 // doRequest Выполняет запрос
