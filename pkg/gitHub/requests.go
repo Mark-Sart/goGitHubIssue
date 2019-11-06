@@ -44,6 +44,33 @@ func CreateIssue(credentials CredentialsModel, scanner *bufio.Scanner) (int, err
 	return 0, fmt.Errorf(response.Status)
 }
 
+// GetIssue Возвращает issue по его номеру
+func GetIssue(credentials CredentialsModel, issueNumber int) (*issueModel, error) {
+	url := fmt.Sprintf("%s/%s/%s/%s/issues/%d", baseURL, repoURL, credentials.Owner, credentials.Repo, issueNumber)
+
+	response, err := doRequest(http.MethodGet, url, credentials.Token, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode == http.StatusNotFound {
+		return nil, fmt.Errorf("issue №%d not found", issueNumber)
+	}
+
+	if response.StatusCode == http.StatusGone {
+		return nil, fmt.Errorf("issue №%d was deleted", issueNumber)
+	}
+
+	issue := &issueModel{}
+	err = json.NewDecoder(response.Body).Decode(issue)
+	if err != nil {
+		return nil, err
+	}
+
+	return issue, nil
+}
+
 // checkMilestone Чекает наличия спринта у репозитория
 func checkMilestone(credentials CredentialsModel, milestone int) (bool, error) {
 	url := fmt.Sprintf("%s/%s/%s/%s/milestones/%d", baseURL, repoURL, credentials.Owner, credentials.Repo, milestone)

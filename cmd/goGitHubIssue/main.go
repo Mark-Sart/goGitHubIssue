@@ -59,9 +59,19 @@ func main() {
 
 		log.Printf("Создан issue № %d", number)
 
+	case "getIssue":
+		issueNumber, err := consoleIO.ReadInt("Введите номер issue", scanner)
+		errHandler(err)
+
+		issue, err := gitHub.GetIssue(credentials, issueNumber)
+		errHandler(err)
+
+		fmt.Printf("%+v", *issue)
+
 	default:
 		fmt.Println("Доступны только следующие операции:")
 		fmt.Printf("%-10s%-s", "create", "создать issue\n")
+		fmt.Printf("%-10s%-s", "getIssue", "получить issue\n")
 
 		return
 	}
