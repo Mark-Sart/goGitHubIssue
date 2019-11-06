@@ -17,23 +17,23 @@ const checkUserConst = 1
 const assignCollaboratorConst = 2
 
 // checkUsers Чекает каждого юзера и возвращает корректных
-func checkUsers(credentials Credentials, users []string) ([]string, error) {
+func checkUsers(credentials CredentialsModel, users []string) ([]string, error) {
 	return multiRequests(credentials, users, checkUserConst)
 }
 
 // checkCollaborators Чекает каждого коллаборатора и возвращает корректных
-func checkCollaborators(credentials Credentials, collaborators []string) ([]string, error) {
+func checkCollaborators(credentials CredentialsModel, collaborators []string) ([]string, error) {
 	return multiRequests(credentials, collaborators, checkCollaboratorConst)
 }
 
 // assignCollaborators Назначает юзеров коллабораторами
-func assignCollaborators(credentials Credentials, users []string) ([]string, error) {
+func assignCollaborators(credentials CredentialsModel, users []string) ([]string, error) {
 	return multiRequests(credentials, users, assignCollaboratorConst)
 }
 
 // multiRequests Мультизапросы
-func multiRequests(credentials Credentials, users []string, operation int) ([]string, error) {
-	ch := make(chan operationCollaboratorsModel)
+func multiRequests(credentials CredentialsModel, users []string, operation int) ([]string, error) {
+	ch := make(chan operationModel)
 	var correctUsers = make([]string, 0)
 
 	for _, user := range users {
@@ -56,8 +56,8 @@ func multiRequests(credentials Credentials, users []string, operation int) ([]st
 }
 
 // multiRequestHandler Обработчик мультизапросов
-func multiRequestHandler(ch chan operationCollaboratorsModel, credentials Credentials, user string, operation int) {
-	operationStatus := operationCollaboratorsModel{
+func multiRequestHandler(ch chan operationModel, credentials CredentialsModel, user string, operation int) {
+	operationStatus := operationModel{
 		name: user,
 	}
 
@@ -104,8 +104,8 @@ func multiRequestHandler(ch chan operationCollaboratorsModel, credentials Creden
 
 // getCollaboratorModel Подготавливает JSON для назначения юзера коллаборатором
 func getCollaboratorModel() (io.Reader, error) {
-	collaborator := collaboratorModel{
-		permission: "push",
+	collaborator := createCollaboratorModel{
+		Permission: "push",
 	}
 
 	return convertStructToJSON(collaborator)

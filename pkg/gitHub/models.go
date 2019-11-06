@@ -1,7 +1,7 @@
 package gitHub
 
-//baseIssueModel Базовая модель для создания и обновления Issue
-type baseIssueModel struct {
+//baseCreateIssueModel Базовая модель для создания и обновления Issue
+type baseCreateIssueModel struct {
 	Title       string   `json:"title"`
 	Description string   `json:"body"`
 	Labels      []string `json:"labels"`
@@ -10,24 +10,24 @@ type baseIssueModel struct {
 
 // createIssueModel Модель для создания Issue
 type createIssueModel struct {
-	baseIssueModel
+	baseCreateIssueModel
 }
 
 // createIssueWithMilestoneModel Модель для создания Issue со спринтом
 type createIssueWithMilestoneModel struct {
-	baseIssueModel
+	baseCreateIssueModel
 	Milestone int `json:"milestone"`
 }
 
-// Credentials Модель для идентификации
-type Credentials struct {
+// CredentialsModel Модель для идентификации
+type CredentialsModel struct {
 	Owner string
 	Repo  string
 	Token string
 }
 
-// milestoneModel Модель для создания спринта
-type milestoneModel struct {
+// createMilestoneModel Модель для создания спринта
+type createMilestoneModel struct {
 	Title       string `json:"title"`
 	State       string `json:"state"`
 	Description string `json:"description"`
@@ -39,9 +39,9 @@ type numberModel struct {
 	Value int `json:"number"`
 }
 
-// operationCollaboratorsModel Модель для выполнение операции по проверки юзера/коллаборатора
+// operationModel Модель для выполнение операции по проверки юзера/коллаборатора
 // или по назначению юзера коллаборатором
-type operationCollaboratorsModel struct {
+type operationModel struct {
 	name   string
 	status bool
 	err    error

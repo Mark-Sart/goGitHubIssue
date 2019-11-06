@@ -15,7 +15,7 @@ const repoURL = "repos"
 const userURL = "users"
 
 // CreateIssue Создает issue
-func CreateIssue(credentials Credentials, scanner *bufio.Scanner) (int, error) {
+func CreateIssue(credentials CredentialsModel, scanner *bufio.Scanner) (int, error) {
 	url := fmt.Sprintf("%s/%s/%s/%s/issues", baseURL, repoURL, credentials.Owner, credentials.Repo)
 
 	log.Println("Начинаю наполнять модель issue")
@@ -45,7 +45,7 @@ func CreateIssue(credentials Credentials, scanner *bufio.Scanner) (int, error) {
 }
 
 // checkMilestone Чекает наличия спринта у репозитория
-func checkMilestone(credentials Credentials, milestone int) (bool, error) {
+func checkMilestone(credentials CredentialsModel, milestone int) (bool, error) {
 	url := fmt.Sprintf("%s/%s/%s/%s/milestones/%d", baseURL, repoURL, credentials.Owner, credentials.Repo, milestone)
 
 	response, err := doRequest(http.MethodGet, url, credentials.Token, nil)
@@ -62,7 +62,7 @@ func checkMilestone(credentials Credentials, milestone int) (bool, error) {
 }
 
 // createMilestone Создает спринт
-func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, error) {
+func createMilestone(credentials CredentialsModel, scanner *bufio.Scanner) (int, error) {
 	url := fmt.Sprintf("%s/%s/%s/%s/milestones", baseURL, repoURL, credentials.Owner, credentials.Repo)
 
 	log.Println("Начинаю наполнять модель спринта")
@@ -92,7 +92,7 @@ func createMilestone(credentials Credentials, scanner *bufio.Scanner) (int, erro
 }
 
 // checkCollaborator Чекает наличие коллаборатора
-func checkCollaborator(credentials Credentials, collaborator string) (bool, error) {
+func checkCollaborator(credentials CredentialsModel, collaborator string) (bool, error) {
 	url := fmt.Sprintf("%s/%s/%s/%s/%s", baseURL, repoURL, credentials.Owner, credentials.Repo, collaborator)
 
 	response, err := doRequest(http.MethodGet, url, credentials.Token, nil)
@@ -108,7 +108,7 @@ func checkCollaborator(credentials Credentials, collaborator string) (bool, erro
 }
 
 // checkUser Чекает наличие юзера
-func checkUser(credentials Credentials, user string) (bool, error) {
+func checkUser(credentials CredentialsModel, user string) (bool, error) {
 	url := fmt.Sprintf("%s/%s/%s", baseURL, userURL, user)
 
 	response, err := doRequest(http.MethodGet, url, credentials.Token, nil)
@@ -124,7 +124,7 @@ func checkUser(credentials Credentials, user string) (bool, error) {
 }
 
 // assignCollaborator Делает юзера коллаборатором
-func assignCollaborator(credentials Credentials, user string, body io.Reader) (bool, error) {
+func assignCollaborator(credentials CredentialsModel, user string, body io.Reader) (bool, error) {
 	url := fmt.Sprintf(
 		"%s/%s/%s/%s/collaborators/%s",
 		baseURL,

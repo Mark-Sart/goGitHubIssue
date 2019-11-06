@@ -10,7 +10,7 @@ import (
 )
 
 // getCreateIssueModelJSON Подготавливает JSON для создания issue
-func getCreateIssueModelJSON(credentials Credentials, scanner *bufio.Scanner) (io.Reader, error) {
+func getCreateIssueModelJSON(credentials CredentialsModel, scanner *bufio.Scanner) (io.Reader, error) {
 	// Переменные
 	var title, description string
 	var milestone int

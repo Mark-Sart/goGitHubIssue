@@ -11,7 +11,7 @@ import (
 
 // getMilestoneModelJSON Подготавливает JSON для создания спринта
 func getMilestoneModelJSON(scanner *bufio.Scanner) (io.Reader, error) {
-	milestone := milestoneModel{}
+	milestone := createMilestoneModel{}
 
 	// Заголовок
 	milestone.Title = consoleIO.ReadString("Введите название", scanner)

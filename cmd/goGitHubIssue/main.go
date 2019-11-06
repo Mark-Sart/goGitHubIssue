@@ -45,7 +45,7 @@ func main() {
 	}
 
 	// Пользовательские данные
-	credentials := gitHub.Credentials{
+	credentials := gitHub.CredentialsModel{
 		Owner: *owner,
 		Repo:  *repo,
 		Token: token,
